@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Журнал действий{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-clock-history"></i> Журнал действий</h1>
+
+        <div class="card-helpdesk">
+            <div class="card-body" style="padding: 0; overflow-x: auto;">
+                {% if logs %}
+                <table class="table-helpdesk">
+                    <thead>
+                        <tr>
+                            <th>Тип действия</th>
+                            <th>Пользователь</th>
+                            <th>Тикет</th>
+                            <th>Описание</th>
+                            <th>Дата и время</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>
+                                <span class="badge-status" style="background: rgba(79,70,229,0.08); color: var(--primary); font-size: 0.75rem;">
+                                    {{ log.get_action_type_display }}
+                                </span>
+                            </td>
+                            <td style="font-size:0.85rem;">{{ log.user|default:"Система" }}</td>
+                            <td>
+                                {% if log.ticket %}
+                                <a href="{% url 'ticket_detail' log.ticket.pk %}">#{{ log.ticket.pk }}</a>
+                                {% else %}—{% endif %}
+                            </td>
+                            <td style="font-size:0.85rem; color: var(--text-secondary);">
+                                {{ log.description|truncatewords:12 }}
+                            </td>
+                            <td style="font-size:0.85rem; color: var(--text-muted); white-space: nowrap;">
+                                {{ log.created_at|date:"d.m.Y H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-5" style="color: var(--text-muted);">
+                    <i class="bi bi-clock-history" style="font-size: 3rem;"></i>
+                    <p class="mt-2">Журнал пуст.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
