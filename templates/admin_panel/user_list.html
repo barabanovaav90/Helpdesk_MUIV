@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Пользователи{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-people"></i> Управление пользователями</h1>
+
+        <div class="filter-bar">
+            <form method="get" class="d-flex gap-1 flex-wrap" style="width:100%;">
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Поиск...">
+                <select name="role" class="form-select">
+                    <option value="">Все роли</option>
+                    {% for value, label in roles %}
+                    <option value="{{ value }}" {% if role_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-helpdesk btn-secondary-helpdesk">
+                    <i class="bi bi-funnel"></i> Фильтр
+                </button>
+            </form>
+        </div>
+
+        <div class="card-helpdesk">
+            <div class="card-body" style="padding:0; overflow-x: auto;">
+                <table class="table-helpdesk">
+                    <thead>
+                        <tr>
+                            <th>Пользователь</th>
+                            <th>Логин</th>
+                            <th>E-mail</th>
+                            <th>Роль</th>
+                            <th>Отдел</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td><strong>{{ u.get_full_name|default:u.username }}</strong></td>
+                            <td style="font-size:0.85rem;">{{ u.username }}</td>
+                            <td style="font-size:0.85rem;">{{ u.email|default:"—" }}</td>
+                            <td>
+                                <span class="badge-status" style="background: rgba(79,70,229,0.1); color: var(--primary);">
+                                    {{ u.role|role_display }}
+                                </span>
+                            </td>
+                            <td style="font-size:0.85rem;">{{ u.department|default:"—" }}</td>
+                            <td>
+                                {% if u.is_active %}
+                                <span class="badge-status" style="background: rgba(16,185,129,0.1); color: var(--success);">Активен</span>
+                                {% else %}
+                                <span class="badge-status" style="background: rgba(239,68,68,0.1); color: var(--danger);">Заблокирован</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
