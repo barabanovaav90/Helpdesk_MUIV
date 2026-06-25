@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Отчёты{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-file-earmark-bar-graph"></i> Генерация отчётов</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card-helpdesk">
+                    <div class="card-header">Параметры отчёта</div>
+                    <div class="card-body" style="padding: 2rem;">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label class="form-label">Формат</label>
+                                <select name="format" class="form-select">
+                                    <option value="xlsx">📊 Excel (.xlsx)</option>
+                                    <option value="docx">📝 Word (.docx)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Фильтр по статусу</label>
+                                <select name="status" class="form-select">
+                                    <option value="">Все статусы</option>
+                                    {% for s in statuses %}
+                                    <option value="{{ s.pk }}">{{ s.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Фильтр по приоритету</label>
+                                <select name="priority" class="form-select">
+                                    <option value="">Все приоритеты</option>
+                                    {% for p in priorities %}
+                                    <option value="{{ p.pk }}">{{ p.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn-helpdesk btn-primary-helpdesk w-100 justify-content-center">
+                                <i class="bi bi-download"></i> Скачать отчёт
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card-helpdesk mt-3">
+                    <div class="card-body">
+                        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">
+                            <i class="bi bi-info-circle"></i> О форматах
+                        </h3>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 1.5rem;">
+                            <li><strong>Excel (.xlsx)</strong> — табличный формат с цветными заголовками, автоширина столбцов, удобен для анализа и фильтрации данных.</li>
+                            <li><strong>Word (.docx)</strong> — документ с таблицей и сводной статистикой, подходит для печати и отправки руководству.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
