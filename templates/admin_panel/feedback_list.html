@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Обращения{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-envelope-open"></i> Обращения (обратная связь)</h1>
+
+        <div class="filter-bar">
+            <a href="{% url 'admin_feedback_list' %}?show=new"
+               class="btn-helpdesk {% if show == 'new' %}btn-primary-helpdesk{% else %}btn-secondary-helpdesk{% endif %}" style="font-size:0.8rem;">
+                Новые
+            </a>
+            <a href="{% url 'admin_feedback_list' %}?show=all"
+               class="btn-helpdesk {% if show == 'all' %}btn-primary-helpdesk{% else %}btn-secondary-helpdesk{% endif %}" style="font-size:0.8rem;">
+                Все
+            </a>
+        </div>
+
+        <div class="card-helpdesk">
+            <div class="card-body" style="padding: 0; overflow-x: auto;">
+                {% if feedbacks %}
+                <table class="table-helpdesk">
+                    <thead>
+                        <tr>
+                            <th>Тема</th>
+                            <th>Имя</th>
+                            <th>E-mail</th>
+                            <th>Статус</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fb in feedbacks %}
+                        <tr>
+                            <td>
+                                <strong>{{ fb.subject }}</strong>
+                                <br><small style="color: var(--text-muted);">{{ fb.message|truncatewords:10 }}</small>
+                            </td>
+                            <td>{{ fb.name }}</td>
+                            <td style="font-size:0.85rem;">{{ fb.email }}</td>
+                            <td>
+                                {% if fb.is_processed %}
+                                <span class="badge-status" style="background: rgba(16,185,129,0.1); color: var(--success);">Обработано</span>
+                                {% else %}
+                                <span class="badge-status" style="background: rgba(245,158,11,0.1); color: var(--warning);">Новое</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size:0.85rem; color: var(--text-muted);">{{ fb.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-5" style="color: var(--text-muted);">
+                    <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                    <p class="mt-2">Обращений нет.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
