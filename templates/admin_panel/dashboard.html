@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-graph-up"></i> Панель управления</h1>
+
+        <!-- Статистика -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon primary"><i class="bi bi-ticket-perforated"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.total_tickets }}</h3>
+                        <p>Всего тикетов</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon warning"><i class="bi bi-clock"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.open_tickets }}</h3>
+                        <p>Открытых</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.closed_tickets }}</h3>
+                        <p>Закрытых</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon danger"><i class="bi bi-exclamation-triangle"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.unassigned }}</h3>
+                        <p>Без исполнителя</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon info"><i class="bi bi-people"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.total_users }}</h3>
+                        <p>Пользователей</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon warning"><i class="bi bi-envelope"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.total_feedback }}</h3>
+                        <p>Новых обращений</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Тикеты по статусам -->
+            <div class="col-lg-6">
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-pie-chart"></i> Тикеты по статусам</div>
+                    <div class="card-body">
+                        {% for status in tickets_by_status %}
+                        <div class="d-flex align-center justify-between mb-2" style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">
+                            <span>
+                                <span class="badge-status" style="background: {{ status.color }}20; color: {{ status.color }};">
+                                    <span class="dot" style="background: {{ status.color }};"></span>
+                                    {{ status.name }}
+                                </span>
+                            </span>
+                            <strong>{{ status.ticket_count }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Тикеты по приоритетам -->
+            <div class="col-lg-6">
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-bar-chart"></i> Тикеты по приоритетам</div>
+                    <div class="card-body">
+                        {% for priority in tickets_by_priority %}
+                        <div class="d-flex align-center justify-between mb-2" style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">
+                            <span>
+                                <span class="badge-priority" style="background: {{ priority.color }}18; color: {{ priority.color }};">
+                                    {{ priority.name }}
+                                </span>
+                            </span>
+                            <strong>{{ priority.ticket_count }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Последняя активность -->
+        <div class="card-helpdesk mt-3">
+            <div class="card-header d-flex justify-between align-center">
+                <span><i class="bi bi-activity"></i> Последняя активность</span>
+                <a href="{% url 'admin_activity_log' %}" style="font-size: 0.8rem;">Полный журнал →</a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                <table class="table-helpdesk">
+                    <thead>
+                        <tr>
+                            <th>Действие</th>
+                            <th>Пользователь</th>
+                            <th>Тикет</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_activity %}
+                        <tr>
+                            <td>{{ log.get_action_type_display }}</td>
+                            <td>{{ log.user|default:"—" }}</td>
+                            <td>
+                                {% if log.ticket %}
+                                <a href="{% url 'ticket_detail' log.ticket.pk %}">#{{ log.ticket.pk }}</a>
+                                {% else %}—{% endif %}
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--text-muted);">
+                                {{ log.created_at|date:"d.m.Y H:i" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
