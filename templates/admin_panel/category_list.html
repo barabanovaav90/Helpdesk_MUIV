@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Справочники{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-tags"></i> Справочники</h1>
+
+        <div class="row g-4">
+            <!-- Категории -->
+            <div class="col-lg-6">
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-folder"></i> Категории тикетов</div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table-helpdesk">
+                            <thead><tr><th>Название</th><th>Slug</th><th>Активна</th></tr></thead>
+                            <tbody>
+                                {% for cat in categories %}
+                                <tr>
+                                    <td><strong>{{ cat.name }}</strong></td>
+                                    <td style="font-size:0.85rem; color: var(--text-muted);">{{ cat.slug }}</td>
+                                    <td>
+                                        {% if cat.is_active %}
+                                        <span style="color: var(--success);">✓</span>
+                                        {% else %}
+                                        <span style="color: var(--danger);">✗</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статусы -->
+            <div class="col-lg-6">
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-tag"></i> Статусы тикетов</div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table-helpdesk">
+                            <thead><tr><th>Название</th><th>Цвет</th><th>Закрывающий</th></tr></thead>
+                            <tbody>
+                                {% for s in statuses %}
+                                <tr>
+                                    <td>
+                                        <span class="badge-status" style="background: {{ s.color }}20; color: {{ s.color }};">
+                                            <span class="dot" style="background: {{ s.color }};"></span>
+                                            {{ s.name }}
+                                        </span>
+                                    </td>
+                                    <td style="font-size:0.85rem;">{{ s.color }}</td>
+                                    <td>{% if s.is_closed %}Да{% else %}Нет{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Приоритеты -->
+            <div class="col-lg-6">
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-exclamation-triangle"></i> Приоритеты</div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table-helpdesk">
+                            <thead><tr><th>Название</th><th>Уровень</th><th>Цвет</th></tr></thead>
+                            <tbody>
+                                {% for p in priorities %}
+                                <tr>
+                                    <td>
+                                        <span class="badge-priority" style="background: {{ p.color }}18; color: {{ p.color }};">
+                                            {{ p.name }}
+                                        </span>
+                                    </td>
+                                    <td>{{ p.level }}</td>
+                                    <td style="font-size:0.85rem;">{{ p.color }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Отделы -->
+            <div class="col-lg-6">
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-building"></i> Отделы</div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table-helpdesk">
+                            <thead><tr><th>Название</th><th>E-mail</th><th>Активен</th></tr></thead>
+                            <tbody>
+                                {% for dept in departments %}
+                                <tr>
+                                    <td><strong>{{ dept.name }}</strong></td>
+                                    <td style="font-size:0.85rem;">{{ dept.email|default:"—" }}</td>
+                                    <td>
+                                        {% if dept.is_active %}
+                                        <span style="color: var(--success);">✓</span>
+                                        {% else %}
+                                        <span style="color: var(--danger);">✗</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">
+                <i class="bi bi-info-circle"></i> Для добавления и редактирования записей используйте
+                <a href="/django-admin/" target="_blank">стандартную админку Django</a>.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
