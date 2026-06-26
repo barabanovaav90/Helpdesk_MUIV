@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-person"></i> Профиль</h1>
+
+        <div class="card-helpdesk mb-3">
+            <div class="card-body" style="padding: 2rem;">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">
+                        {{ profile_user.first_name|first|default:"?" }}
+                    </div>
+                    <div class="profile-info">
+                        <h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+                        <p>
+                            <span class="badge-status" style="background: rgba(79,70,229,0.1); color: var(--primary);">
+                                {{ profile_user.role|role_display }}
+                            </span>
+                            {% if profile_user.department %}
+                            · {{ profile_user.department.name }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon primary"><i class="bi bi-ticket-perforated"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ tickets_count }}</h3>
+                            <p>Тикетов</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon info"><i class="bi bi-chat-dots"></i></div>
+                        <div class="stat-content">
+                            <h3>{{ comments_count }}</h3>
+                            <p>Комментариев</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="ticket-info-item">
+                            <div class="label">Логин</div>
+                            <div class="value">{{ profile_user.username }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="ticket-info-item">
+                            <div class="label">E-mail</div>
+                            <div class="value">{{ profile_user.email|default:"—" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="ticket-info-item">
+                            <div class="label">Телефон</div>
+                            <div class="value">{{ profile_user.phone|default:"—" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="ticket-info-item">
+                            <div class="label">Дата регистрации</div>
+                            <div class="value">{{ profile_user.date_joined|date:"d.m.Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if profile_user.bio %}
+                <div class="mt-3">
+                    <h3 style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">О себе</h3>
+                    <p style="color: var(--text-secondary);">{{ profile_user.bio }}</p>
+                </div>
+                {% endif %}
+
+                <div class="mt-3">
+                    <a href="{% url 'profile_edit' %}" class="btn-helpdesk btn-primary-helpdesk">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
