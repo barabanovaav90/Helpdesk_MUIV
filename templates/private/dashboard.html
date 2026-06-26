@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    <!-- Боковая панель -->
+    {% include 'includes/sidebar.html' %}
+
+    <div class="main-content fade-in">
+        <h1 class="page-title">
+            <span><i class="bi bi-speedometer2"></i> Личный кабинет</span>
+        </h1>
+
+        <!-- Статистика -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon primary"><i class="bi bi-ticket-perforated"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.total }}</h3>
+                        <p>Всего тикетов</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon warning"><i class="bi bi-clock-history"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.open }}</h3>
+                        <p>Открытых</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+                    <div class="stat-content">
+                        <h3>{{ stats.closed }}</h3>
+                        <p>Закрытых</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Последние тикеты -->
+            <div class="col-lg-7">
+                <div class="card-helpdesk">
+                    <div class="card-header d-flex justify-between align-center">
+                        <span><i class="bi bi-ticket-perforated"></i> Последние тикеты</span>
+                        <a href="{% url 'ticket_list' %}" style="font-size: 0.8rem;">Все тикеты →</a>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        {% if recent_tickets %}
+                        <table class="table-helpdesk">
+                            <thead>
+                                <tr>
+                                    <th>Тема</th>
+                                    <th>Статус</th>
+                                    <th>Дата</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in recent_tickets %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'ticket_detail' ticket.pk %}" class="ticket-link">
+                                            #{{ ticket.pk }} — {{ ticket.title|truncatewords:6 }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge-status" style="background: {{ ticket.status.color }}20; color: {{ ticket.status.color }};">
+                                            <span class="dot" style="background: {{ ticket.status.color }};"></span>
+                                            {{ ticket.status.name }}
+                                        </span>
+                                    </td>
+                                    <td style="font-size: 0.85rem; color: var(--text-muted);">
+                                        {{ ticket.created_at|date:"d.m.Y" }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center py-4" style="color: var(--text-muted);">
+                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                            <p class="mt-2">У вас пока нет тикетов.</p>
+                            <a href="{% url 'ticket_create' %}" class="btn-helpdesk btn-primary-helpdesk mt-1">
+                                <i class="bi bi-plus"></i> Создать тикет
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Последние действия -->
+            <div class="col-lg-5">
+                <div class="card-helpdesk">
+                    <div class="card-header">
+                        <i class="bi bi-activity"></i> Последние действия
+                    </div>
+                    <div class="card-body">
+                        {% if recent_activity %}
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            {% for log in recent_activity %}
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+                                <strong>{{ log.get_action_type_display }}</strong>
+                                {% if log.ticket %}
+                                — <a href="{% url 'ticket_detail' log.ticket.pk %}">#{{ log.ticket.pk }}</a>
+                                {% endif %}
+                                <br>
+                                <small style="color: var(--text-muted);">{{ log.created_at|date:"d.m.Y H:i" }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p style="color: var(--text-muted); text-align: center;">Действий пока нет.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
