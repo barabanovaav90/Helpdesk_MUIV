@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Новый тикет{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title"><i class="bi bi-plus-circle"></i> Создание нового тикета</h1>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card-helpdesk">
+                    <div class="card-body" style="padding: 2rem;">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    {{ field.label }}{% if field.field.required %} <span style="color: var(--danger);">*</span>{% endif %}
+                                </label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                                    {% for error in field.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-paperclip"></i> Вложения
+                                </label>
+                                <input type="file" name="attachments" class="form-control" multiple>
+                                <div class="form-text">Можно выбрать несколько файлов. Макс. размер: 10 МБ.</div>
+                            </div>
+
+                            <div class="d-flex gap-1">
+                                <button type="submit" class="btn-helpdesk btn-primary-helpdesk">
+                                    <i class="bi bi-check-lg"></i> Создать тикет
+                                </button>
+                                <a href="{% url 'ticket_list' %}" class="btn-helpdesk btn-secondary-helpdesk">
+                                    Отмена
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
