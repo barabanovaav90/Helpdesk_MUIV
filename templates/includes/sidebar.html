@@ -1,0 +1,112 @@
+<!-- Боковая панель навигации (sidebar) — включается в приватные страницы -->
+{% load helpdesk_tags %}
+
+<button class="btn btn-primary d-md-none position-fixed shadow" 
+        style="bottom: 20px; right: 20px; z-index: 1040; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;" 
+        type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+    <i class="bi bi-list" style="font-size: 1.5rem;"></i>
+</button>
+
+<aside class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    <div class="offcanvas-header d-md-none px-3" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <h5 class="offcanvas-title" id="sidebarMenuLabel" style="color: white; font-weight: 600;"><i class="bi bi-headset"></i> Меню кабинета</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body flex-column p-0">
+        <div class="sidebar-heading" data-bs-toggle="collapse" data-bs-target="#collapseCabinet" aria-expanded="true" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+        Личный кабинет <i class="bi bi-chevron-down"></i>
+    </div>
+    <div class="collapse show" id="collapseCabinet">
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="{% url 'dashboard' %}" class="nav-link {% active_link request 'dashboard' %}">
+                    <span class="icon"><i class="bi bi-speedometer2"></i></span> Дашборд
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'ticket_list' %}" class="nav-link {% active_link request 'ticket_list' %}">
+                    <span class="icon"><i class="bi bi-ticket-perforated"></i></span> Мои тикеты
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'ticket_create' %}" class="nav-link {% active_link request 'ticket_create' %}">
+                    <span class="icon"><i class="bi bi-plus-circle"></i></span> Новый тикет
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'profile' %}" class="nav-link {% active_link request 'profile' %}">
+                    <span class="icon"><i class="bi bi-person"></i></span> Профиль
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'profile_edit' %}" class="nav-link {% active_link request 'profile_edit' %}">
+                    <span class="icon"><i class="bi bi-pencil-square"></i></span> Редактировать профиль
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {% if not user.is_client %}
+    <div class="sidebar-heading" data-bs-toggle="collapse" data-bs-target="#collapseAdmin" aria-expanded="true" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+        Управление <i class="bi bi-chevron-down"></i>
+    </div>
+    <div class="collapse show" id="collapseAdmin">
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="{% url 'admin_dashboard' %}" class="nav-link {% active_link request 'admin_dashboard' %}">
+                    <span class="icon"><i class="bi bi-graph-up"></i></span> Панель управления
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin_user_list' %}" class="nav-link {% active_link request 'admin_user_list' %}">
+                    <span class="icon"><i class="bi bi-people"></i></span> Пользователи
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin_category_list' %}" class="nav-link {% active_link request 'admin_category_list' %}">
+                    <span class="icon"><i class="bi bi-tags"></i></span> Справочники
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin_reports' %}" class="nav-link {% active_link request 'admin_reports' %}">
+                    <span class="icon"><i class="bi bi-file-earmark-bar-graph"></i></span> Отчёты
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin_feedback_list' %}" class="nav-link {% active_link request 'admin_feedback_list' %}">
+                    <span class="icon"><i class="bi bi-envelope-open"></i></span> Обращения
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'admin_activity_log' %}" class="nav-link {% active_link request 'admin_activity_log' %}">
+                    <span class="icon"><i class="bi bi-clock-history"></i></span> Журнал действий
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="sidebar-heading" data-bs-toggle="collapse" data-bs-target="#collapseNav" aria-expanded="true" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+        Навигация <i class="bi bi-chevron-down"></i>
+    </div>
+    <div class="collapse show" id="collapseNav">
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="{% url 'home' %}" class="nav-link">
+                    <span class="icon"><i class="bi bi-house"></i></span> На главную
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'faq' %}" class="nav-link">
+                    <span class="icon"><i class="bi bi-question-circle"></i></span> FAQ
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'logout' %}" class="nav-link">
+                    <span class="icon"><i class="bi bi-box-arrow-right"></i></span> Выход
+                </a>
+            </li>
+        </ul>
+    </div>
+    </div>
+</aside>
