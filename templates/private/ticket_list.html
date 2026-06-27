@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Мои тикеты{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title">
+            <span><i class="bi bi-ticket-perforated"></i> Мои тикеты</span>
+            <a href="{% url 'ticket_create' %}" class="btn-helpdesk btn-primary-helpdesk">
+                <i class="bi bi-plus"></i> Новый тикет
+            </a>
+        </h1>
+
+        <!-- Фильтры -->
+        <div class="filter-bar">
+            <form method="get" class="d-flex gap-1 flex-wrap" style="width:100%;">
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Поиск...">
+                <select name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    {% for s in statuses %}
+                    <option value="{{ s.slug }}" {% if current_status == s.slug %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="priority" class="form-select">
+                    <option value="">Все приоритеты</option>
+                    {% for p in priorities %}
+                    <option value="{{ p.slug }}" {% if current_priority == p.slug %}selected{% endif %}>{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-helpdesk btn-secondary-helpdesk">
+                    <i class="bi bi-funnel"></i> Фильтр
+                </button>
+            </form>
+        </div>
+
+        <!-- Таблица тикетов -->
+        <div class="card-helpdesk">
+            <div class="card-body" style="padding:0; overflow-x: auto;">
+                {% if tickets %}
+                <table class="table-helpdesk">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Тема</th>
+                            <th>Категория</th>
+                            <th>Приоритет</th>
+                            <th>Статус</th>
+                            <th>Исполнитель</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td><strong>#{{ ticket.pk }}</strong></td>
+                            <td>
+                                <a href="{% url 'ticket_detail' ticket.pk %}" class="ticket-link">
+                                    {{ ticket.title|truncatewords:8 }}
+                                </a>
+                            </td>
+                            <td style="font-size:0.85rem;">{{ ticket.category.name }}</td>
+                            <td>
+                                <span class="badge-priority" style="background: {{ ticket.priority.color }}18; color: {{ ticket.priority.color }};">
+                                    {{ ticket.priority.name }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-status" style="background: {{ ticket.status.color }}20; color: {{ ticket.status.color }};">
+                                    <span class="dot" style="background: {{ ticket.status.color }};"></span>
+                                    {{ ticket.status.name }}
+                                </span>
+                            </td>
+                            <td style="font-size:0.85rem; color: var(--text-muted);">
+                                {{ ticket.assignee|default:"—" }}
+                            </td>
+                            <td style="font-size:0.85rem; color: var(--text-muted); white-space: nowrap;">
+                                {{ ticket.created_at|date:"d.m.Y" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-muted);"></i>
+                    <p class="mt-2" style="color: var(--text-muted);">Тикеты не найдены.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
