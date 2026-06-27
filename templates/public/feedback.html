@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Обратная связь{% endblock %}
+{% block meta_description %}Форма обратной связи. Напишите нам — и мы обязательно ответим.{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card-helpdesk">
+                <div class="card-body" style="padding: 2rem;">
+                    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                        <i class="bi bi-envelope"></i> Обратная связь
+                    </h1>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                        Заполните форму ниже, и мы свяжемся с вами в ближайшее время.
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}{% if field.field.required %} <span style="color: var(--danger);">*</span>{% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn-helpdesk btn-primary-helpdesk w-100 justify-content-center">
+                            <i class="bi bi-send"></i> Отправить
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
