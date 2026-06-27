@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+
+{% block title %}Тикет #{{ ticket.pk }}{% endblock %}
+
+{% block content %}
+<div class="layout-wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main-content fade-in">
+        <h1 class="page-title">
+            <span><i class="bi bi-ticket-perforated"></i> #{{ ticket.pk }} — {{ ticket.title }}</span>
+        </h1>
+
+        <div class="row g-4">
+            <!-- Основная информация -->
+            <div class="col-lg-8">
+                <!-- Информация о тикете -->
+                <div class="card-helpdesk mb-3">
+                    <div class="card-header">Информация о тикете</div>
+                    <div class="card-body">
+                        <div class="ticket-info-grid">
+                            <div class="ticket-info-item">
+                                <div class="label">Статус</div>
+                                <div class="value">
+                                    <span class="badge-status" style="background: {{ ticket.status.color }}20; color: {{ ticket.status.color }};">
+                                        <span class="dot" style="background: {{ ticket.status.color }};"></span>
+                                        {{ ticket.status.name }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="ticket-info-item">
+                                <div class="label">Приоритет</div>
+                                <div class="value">
+                                    <span class="badge-priority" style="background: {{ ticket.priority.color }}18; color: {{ ticket.priority.color }};">
+                                        {{ ticket.priority.name }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="ticket-info-item">
+                                <div class="label">Категория</div>
+                                <div class="value">{{ ticket.category.name }}</div>
+                            </div>
+                            <div class="ticket-info-item">
+                                <div class="label">Автор</div>
+                                <div class="value">{{ ticket.author }}</div>
+                            </div>
+                            <div class="ticket-info-item">
+                                <div class="label">Исполнитель</div>
+                                <div class="value">{{ ticket.assignee|default:"Не назначен" }}</div>
+                            </div>
+                            <div class="ticket-info-item">
+                                <div class="label">Дата создания</div>
+                                <div class="value">{{ ticket.created_at|date:"d.m.Y H:i" }}</div>
+                            </div>
+                        </div>
+
+                        <h3 style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                            Описание
+                        </h3>
+                        <p style="line-height: 1.7; color: var(--text-secondary);">{{ ticket.description|linebreaksbr }}</p>
+                    </div>
+                </div>
+
+                <!-- Вложения -->
+                {% if attachments %}
+                <div class="card-helpdesk mb-3">
+                    <div class="card-header"><i class="bi bi-paperclip"></i> Вложения ({{ attachments.count }})</div>
+                    <div class="card-body">
+                        {% for att in attachments %}
+                        <div class="d-flex align-center gap-1 mb-1" style="padding: 0.4rem 0; border-bottom: 1px solid var(--border-color);">
+                            <i class="bi bi-file-earmark" style="color: var(--primary);"></i>
+                            <a href="{{ att.file.url }}" target="_blank">{{ att.original_filename }}</a>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: auto;">
+                                {{ att.file_size|file_size_format }} · {{ att.uploaded_at|date:"d.m.Y H:i" }}
+                            </span>
+                            {% if user.is_superuser %}
+                                        <button type="button" class="btn btn-sm text-danger" style="padding: 0; background: none; border: none; margin-left: 0.5rem;" title="Удалить вложение" onclick="openDeleteModal('{% url 'delete_attachment' att.pk %}', 'Вы уверены, что хотите удалить это вложение?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Комментарии -->
+                <div class="card-helpdesk mb-3">
+                    <div class="card-header"><i class="bi bi-chat-dots"></i> Переписка ({{ comments.count }})</div>
+                    <div class="card-body">
+                        {% if comments %}
+                        <ul class="comment-timeline">
+                            {% for comment in comments %}
+                            <li class="comment-item">
+                                <div class="comment-avatar">
+                                    {{ comment.author.first_name|first|default:"?" }}
+                                </div>
+                                <div class="comment-body">
+                                    <div class="comment-header" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span class="comment-author">{{ comment.author }}</span>
+                                        <span class="comment-date">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                                        {% if comment.is_internal %}
+                                        <span class="comment-internal-badge">🔒 Внутренний</span>
+                                        {% endif %}
+                                        
+                                        {% if user.is_superuser %}
+                                        <button type="button" class="btn btn-sm text-danger" style="padding: 0; background: none; border: none; margin-left: auto;" title="Удалить комментарий" onclick="openDeleteModal('{% url 'delete_comment' comment.pk %}', 'Вы уверены, что хотите удалить этот комментарий и все его вложения?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                    <div class="comment-text">{{ comment.text|linebreaksbr }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-center" style="color: var(--text-muted);">Комментариев пока нет.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Форма комментария -->
+                {% if not ticket.is_closed %}
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-reply"></i> Добавить комментарий</div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="comment">
+                            {{ comment_form.text }}
+                            <div class="d-flex gap-1 mt-2 align-center flex-wrap">
+                                <input type="file" name="attachments" class="form-control" multiple style="max-width: 250px;">
+                                {% if not user.is_client %}
+                                <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                                    <input type="checkbox" name="is_internal"> Внутренний
+                                </label>
+                                {% endif %}
+                                <button type="submit" class="btn-helpdesk btn-primary-helpdesk" style="margin-left: auto;">
+                                    <i class="bi bi-send"></i> Отправить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Боковая панель тикета -->
+            <div class="col-lg-4">
+                {% if status_form %}
+                <div class="card-helpdesk mb-3">
+                    <div class="card-header"><i class="bi bi-gear"></i> Управление тикетом</div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="update_status">
+                            <div class="mb-2">
+                                <label class="form-label">Статус</label>
+                                {{ status_form.status }}
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Исполнитель</label>
+                                {{ status_form.assignee }}
+                            </div>
+                            <button type="submit" class="btn-helpdesk btn-success-helpdesk w-100 justify-content-center">
+                                <i class="bi bi-check-lg"></i> Обновить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card-helpdesk">
+                    <div class="card-header"><i class="bi bi-info-circle"></i> Сводка</div>
+                    <div class="card-body">
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem;">
+                            <li class="mb-1">
+                                <span style="color: var(--text-muted);">Комментариев:</span>
+                                <strong>{{ comments.count }}</strong>
+                            </li>
+                            <li class="mb-1">
+                                <span style="color: var(--text-muted);">Вложений:</span>
+                                <strong>{{ attachments.count }}</strong>
+                            </li>
+                            <li class="mb-1">
+                                <span style="color: var(--text-muted);">Обновлён:</span>
+                                <strong>{{ ticket.updated_at|date:"d.m.Y H:i" }}</strong>
+                            </li>
+                            {% if ticket.closed_at %}
+                            <li>
+                                <span style="color: var(--text-muted);">Закрыт:</span>
+                                <strong>{{ ticket.closed_at|date:"d.m.Y H:i" }}</strong>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fs-5">Подтверждение</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <p id="deleteConfirmMessage" class="mb-0">Вы уверены?</p>
+      </div>
+      <div class="modal-footer border-0 pt-0 justify-content-center">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отмена</button>
+        <form id="deleteConfirmForm" method="post" action="">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openDeleteModal(url, message) {
+    document.getElementById('deleteConfirmForm').action = url;
+    document.getElementById('deleteConfirmMessage').textContent = message;
+    var myModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    myModal.show();
+}
+</script>
+{% endblock %}
