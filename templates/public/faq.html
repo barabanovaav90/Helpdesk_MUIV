@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}FAQ — Часто задаваемые вопросы{% endblock %}
+{% block meta_description %}Ответы на часто задаваемые вопросы о работе системы Helpdesk.{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in">
+    <h1 class="page-title">
+        <span><i class="bi bi-question-circle"></i> Часто задаваемые вопросы</span>
+    </h1>
+
+    {% if categories %}
+    <div class="filter-bar">
+        <a href="{% url 'faq' %}" class="btn-helpdesk {% if not current_category %}btn-primary-helpdesk{% else %}btn-secondary-helpdesk{% endif %}" style="font-size:0.8rem;">
+            Все
+        </a>
+        {% for cat in categories %}
+        <a href="{% url 'faq' %}?category={{ cat.slug }}"
+           class="btn-helpdesk {% if current_category == cat.slug %}btn-primary-helpdesk{% else %}btn-secondary-helpdesk{% endif %}" style="font-size:0.8rem;">
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if articles %}
+        {% for article in articles %}
+        <div class="faq-item">
+            <div class="faq-question">
+                <span>{{ article.question }}</span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-answer-inner">
+                    {{ article.answer }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card-helpdesk">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-muted);"></i>
+                <p class="mt-2" style="color: var(--text-muted);">Статьи FAQ пока не добавлены.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
