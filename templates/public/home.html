@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static helpdesk_tags %}
+
+{% block title %}Главная{% endblock %}
+{% block meta_description %}Helpdesk — система технической поддержки. Создавайте заявки, отслеживайте статус обращений, находите ответы в базе знаний.{% endblock %}
+
+{% block content %}
+<!-- Герой-секция -->
+<section class="hero-section">
+    <div class="container" style="position: relative; z-index: 1;">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="hero-title">Служба технической<br>поддержки</h1>
+                <p class="hero-subtitle">
+                    Быстрое решение технических проблем. Создайте заявку — и наши специалисты
+                    помогут вам в кратчайшие сроки. База знаний и FAQ помогут найти ответ самостоятельно.
+                </p>
+                <div class="hero-actions">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'ticket_create' %}" class="btn-helpdesk btn-primary-helpdesk">
+                            <i class="bi bi-plus-circle"></i> Создать заявку
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="btn-helpdesk btn-secondary-helpdesk" style="background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);">
+                            <i class="bi bi-speedometer2"></i> Личный кабинет
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn-helpdesk btn-primary-helpdesk">
+                            <i class="bi bi-person-plus"></i> Зарегистрироваться
+                        </a>
+                        <a href="{% url 'login' %}" class="btn-helpdesk btn-secondary-helpdesk" style="background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="hero-stats">
+                    <div class="hero-stat-item">
+                        <h3>{{ stats.tickets_total }}</h3>
+                        <p>Обращений</p>
+                    </div>
+                    <div class="hero-stat-item">
+                        <h3>{{ stats.tickets_resolved }}</h3>
+                        <p>Решено</p>
+                    </div>
+                    <div class="hero-stat-item">
+                        <h3>{{ stats.faq_count }}</h3>
+                        <p>Статей FAQ</p>
+                    </div>
+                    <div class="hero-stat-item">
+                        <h3>{{ stats.kb_count }}</h3>
+                        <p>База знаний</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Последние статьи базы знаний -->
+{% if recent_articles %}
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Полезные материалы</h2>
+        <p class="section-subtitle">Последние статьи из базы знаний</p>
+        <div class="row g-4">
+            {% for article in recent_articles %}
+            <div class="col-md-4">
+                <div class="article-card">
+                    <h3 class="article-title">
+                        <a href="{% url 'kb_article_detail' article.slug %}">{{ article.title }}</a>
+                    </h3>
+                    <p class="article-excerpt">
+                        {{ article.content|markdown_format|striptags|truncatewords:25 }}
+                    </p>
+                    <div class="article-meta">
+                        <span><i class="bi bi-eye"></i> {{ article.views_count }}</span>
+                        <span>{{ article.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'knowledge_base' %}" class="btn-helpdesk btn-secondary-helpdesk">
+                Все статьи <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Быстрые ссылки -->
+<section class="section" style="background: var(--gray-50);">
+    <div class="container">
+        <h2 class="section-title text-center">Чем мы можем помочь?</h2>
+        <p class="section-subtitle text-center">Выберите подходящий раздел</p>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3">
+                <div class="article-card text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎫</div>
+                    <h3 class="article-title">Создать заявку</h3>
+                    <p class="article-excerpt">Опишите проблему — мы решим её</p>
+                    <a href="{% url 'ticket_create' %}" class="btn-helpdesk btn-primary-helpdesk w-100 justify-content-center mt-2">Создать</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="article-card text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">❓</div>
+                    <h3 class="article-title">FAQ</h3>
+                    <p class="article-excerpt">Ответы на частые вопросы</p>
+                    <a href="{% url 'faq' %}" class="btn-helpdesk btn-secondary-helpdesk w-100 justify-content-center mt-2">Открыть</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="article-card text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">📚</div>
+                    <h3 class="article-title">База знаний</h3>
+                    <p class="article-excerpt">Инструкции и руководства</p>
+                    <a href="{% url 'knowledge_base' %}" class="btn-helpdesk btn-secondary-helpdesk w-100 justify-content-center mt-2">Открыть</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="article-card text-center">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">📞</div>
+                    <h3 class="article-title">Контакты</h3>
+                    <p class="article-excerpt">Свяжитесь с нами напрямую</p>
+                    <a href="{% url 'contacts' %}" class="btn-helpdesk btn-secondary-helpdesk w-100 justify-content-center mt-2">Открыть</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
