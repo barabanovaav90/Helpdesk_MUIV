@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block meta_description %}{{ article.content|markdown_format|striptags|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <article class="card-helpdesk">
+                <div class="card-body" style="padding: 2rem;">
+                    {% if article.category %}
+                    <span class="badge-status mb-2" style="background: rgba(79,70,229,0.1); color: var(--primary); font-size: 0.75rem;">
+                        {{ article.category.name }}
+                    </span>
+                    {% endif %}
+
+                    <h1 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem;">
+                        {{ article.title }}
+                    </h1>
+
+                    <div class="d-flex gap-2 mb-3" style="font-size: 0.85rem; color: var(--text-muted);">
+                        {% if article.author %}
+                        <span><i class="bi bi-person"></i> {{ article.author }}</span>
+                        {% endif %}
+                        <span><i class="bi bi-calendar"></i> {{ article.created_at|date:"d.m.Y" }}</span>
+                        <span><i class="bi bi-eye"></i> {{ article.views_count }} просмотров</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-page" style="max-width: 100%; padding: 0;">
+                        {{ article.content|markdown_format }}
+                    </div>
+
+                    {% if article.tags.all %}
+                    <div class="mt-3" style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                        <strong style="font-size: 0.85rem;">Теги:</strong>
+                        {% for tag in article.tags.all %}
+                        <span class="badge-status" style="background: var(--gray-100); color: var(--text-secondary); font-size: 0.75rem;">
+                            {{ tag.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+
+            <div class="mt-3">
+                <a href="{% url 'knowledge_base' %}" class="btn-helpdesk btn-secondary-helpdesk">
+                    <i class="bi bi-arrow-left"></i> Назад к базе знаний
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
