@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load helpdesk_tags %}
+{% block title %}База знаний{% endblock %}
+{% block meta_description %}База знаний Helpdesk — статьи, инструкции и руководства по работе с системой.{% endblock %}
+
+{% block content %}
+<div class="container py-4 fade-in">
+    <h1 class="page-title">
+        <span><i class="bi bi-book"></i> База знаний</span>
+    </h1>
+
+    <!-- Поиск и фильтры -->
+    <div class="filter-bar">
+        <form method="get" class="d-flex gap-1 flex-wrap" style="width: 100%;">
+            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Поиск по статьям..." style="max-width: 300px;">
+            <select name="category" class="form-select" style="max-width: 200px;">
+                <option value="">Все категории</option>
+                {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-helpdesk btn-primary-helpdesk">
+                <i class="bi bi-search"></i> Найти
+            </button>
+        </form>
+    </div>
+
+    {% if articles %}
+    <div class="row g-4">
+        {% for article in articles %}
+        <div class="col-md-6 col-lg-4">
+            <div class="article-card">
+                {% if article.category %}
+                <span class="badge-status mb-1" style="background: rgba(79,70,229,0.1); color: var(--primary); font-size: 0.7rem;">
+                    {{ article.category.name }}
+                </span>
+                {% endif %}
+                <h3 class="article-title">
+                    <a href="{% url 'kb_article_detail' article.slug %}">{{ article.title }}</a>
+                </h3>
+                <p class="article-excerpt">
+                    {{ article.content|markdown_format|striptags|truncatewords:20 }}
+                </p>
+                <div class="article-meta">
+                    <span><i class="bi bi-eye"></i> {{ article.views_count }}</span>
+                    <span>{{ article.created_at|date:"d.m.Y" }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-helpdesk">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-search" style="font-size: 3rem; color: var(--text-muted);"></i>
+            <p class="mt-2" style="color: var(--text-muted);">
+                {% if query %}Ничего не найдено по запросу «{{ query }}».{% else %}Статьи пока не добавлены.{% endif %}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
